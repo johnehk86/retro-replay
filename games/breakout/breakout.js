@@ -281,6 +281,57 @@
   startBtn.addEventListener('click', startGame);
   pauseBtn.addEventListener('click', togglePause);
 
+  // Touch controls - buttons
+  function addHoldBtn(id, keyName) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('touchstart', e => {
+      e.preventDefault();
+      if (!gameRunning || gameOver) { startGame(); return; }
+      keys[keyName] = true;
+    });
+    btn.addEventListener('touchend', e => {
+      e.preventDefault();
+      keys[keyName] = false;
+    });
+    btn.addEventListener('touchcancel', () => { keys[keyName] = false; });
+  }
+  addHoldBtn('touchLeft', 'ArrowLeft');
+  addHoldBtn('touchRight', 'ArrowRight');
+
+  // Launch button
+  const touchLaunchBtn = document.getElementById('touchLaunch');
+  if (touchLaunchBtn) {
+    touchLaunchBtn.addEventListener('touchstart', e => {
+      e.preventDefault();
+      if (!gameRunning || gameOver) { startGame(); return; }
+      if (!ballLaunched) ballLaunched = true;
+    });
+  }
+
+  // Touch on canvas - move paddle to finger X position
+  function handleCanvasTouch(e) {
+    e.preventDefault();
+    if (!gameRunning || gamePaused || gameOver) return;
+    const touch = e.touches[0];
+    if (!touch) return;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const touchX = (touch.clientX - rect.left) * scaleX;
+    paddle.x = Math.max(0, Math.min(W - paddle.w, touchX - paddle.w / 2));
+  }
+  canvas.addEventListener('touchstart', e => {
+    if (!gameRunning || gameOver) {
+      e.preventDefault();
+      startGame();
+      return;
+    }
+    e.preventDefault();
+    if (!ballLaunched) ballLaunched = true;
+    handleCanvasTouch(e);
+  });
+  canvas.addEventListener('touchmove', handleCanvasTouch);
+
   // Initial draw
   paddle = { x: W / 2 - PADDLE_W / 2, y: H - 30, w: PADDLE_W, h: PADDLE_H };
   ball = { x: W / 2, y: H - 40 - BALL_R, dx: 0, dy: 0, r: BALL_R };

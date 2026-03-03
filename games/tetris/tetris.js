@@ -348,6 +348,44 @@
   startBtn.addEventListener('click', startGame);
   pauseBtn.addEventListener('click', togglePause);
 
+  // Touch controls
+  function addTouchBtn(id, action) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    let interval = null;
+    btn.addEventListener('touchstart', e => {
+      e.preventDefault();
+      if (!gameRunning || gamePaused || gameOver) return;
+      action();
+      // Repeat for held buttons (left/right/down)
+      if (id === 'touchLeft' || id === 'touchRight' || id === 'touchDown') {
+        interval = setInterval(action, 100);
+      }
+    });
+    btn.addEventListener('touchend', e => {
+      e.preventDefault();
+      clearInterval(interval);
+      interval = null;
+    });
+    btn.addEventListener('touchcancel', () => {
+      clearInterval(interval);
+      interval = null;
+    });
+  }
+  addTouchBtn('touchLeft', moveLeft);
+  addTouchBtn('touchRight', moveRight);
+  addTouchBtn('touchDown', () => { moveDown(); score += 1; updateUI(); });
+  addTouchBtn('touchRotate', rotate);
+  addTouchBtn('touchDrop', hardDrop);
+
+  // Touch on canvas to start game
+  canvas.addEventListener('touchstart', e => {
+    if (!gameRunning || gameOver) {
+      e.preventDefault();
+      startGame();
+    }
+  });
+
   // Initial draw
   createBoard();
   drawBoard();

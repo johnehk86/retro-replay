@@ -242,6 +242,48 @@
   // Prevent context menu on grid
   gridEl.addEventListener('contextmenu', e => e.preventDefault());
 
+  // Mobile flag mode toggle
+  let flagMode = false;
+  const flagToggleBtn = document.getElementById('touchFlagToggle');
+  if (flagToggleBtn) {
+    flagToggleBtn.addEventListener('click', () => {
+      flagMode = !flagMode;
+      flagToggleBtn.textContent = flagMode ? '\u{1F6A9} FLAG MODE: ON' : '\u{1F6A9} FLAG MODE: OFF';
+      flagToggleBtn.classList.toggle('flag-active', flagMode);
+    });
+  }
+
+  // Intercept clicks on grid: if flag mode is on, flag instead of open
+  const origHandleClick = handleClick;
+  handleClick = function(r, c) {
+    if (flagMode) {
+      handleRightClick(r, c);
+    } else {
+      origHandleClick(r, c);
+    }
+  };
+
+  // Rebind cell clicks to use the new handleClick
+  const origBuildGrid = buildGrid;
+  buildGrid = function() {
+    gridEl.innerHTML = '';
+    gridEl.style.gridTemplateColumns = `repeat(${cols}, 30px)`;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const cell = document.createElement('button');
+        cell.className = 'mine-cell hidden';
+        cell.dataset.row = r;
+        cell.dataset.col = c;
+        cell.addEventListener('click', () => handleClick(r, c));
+        cell.addEventListener('contextmenu', e => {
+          e.preventDefault();
+          handleRightClick(r, c);
+        });
+        gridEl.appendChild(cell);
+      }
+    }
+  };
+
   // Init
   init();
 })();

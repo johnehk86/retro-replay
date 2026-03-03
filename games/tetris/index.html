@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Tetris - Retro Replay</title>
   <link rel="stylesheet" href="../../css/style.css">
   <link rel="stylesheet" href="style.css">
@@ -59,6 +59,18 @@
       <button class="btn" id="pauseBtn">PAUSE</button>
     </div>
 
+    <div class="touch-controls" id="touchControls">
+      <div class="touch-row">
+        <button class="touch-btn" id="touchLeft" aria-label="Left">&#9664;</button>
+        <button class="touch-btn touch-btn-yellow" id="touchDown" aria-label="Soft Drop">&#9660;</button>
+        <button class="touch-btn" id="touchRight" aria-label="Right">&#9654;</button>
+      </div>
+      <div class="touch-row" style="margin-left: 1.5rem;">
+        <button class="touch-btn touch-btn-green" id="touchRotate" aria-label="Rotate">&#8635;</button>
+        <button class="touch-btn touch-btn-magenta" id="touchDrop" aria-label="Hard Drop">&#11015;</button>
+      </div>
+    </div>
+
     <div class="controls-help">
       <kbd>&larr;</kbd> <kbd>&rarr;</kbd> Move &nbsp;
       <kbd>&uarr;</kbd> Rotate &nbsp;
@@ -66,6 +78,14 @@
       <kbd>Space</kbd> Hard Drop &nbsp;
       <kbd>P</kbd> Pause
     </div>
+    <a href="https://aicraftlog.com" target="_blank" rel="noopener noreferrer" class="ad-banner">
+      <span class="ad-banner-icon">&#10024;</span>
+      <div class="ad-banner-text">
+        <div class="ad-banner-title">AI Craft Log</div>
+        <div class="ad-banner-desc">AI로 만든 더 재미있는 결과물들을 구경하세요!</div>
+      </div>
+      <span class="ad-banner-arrow">&#10132;</span>
+    </a>
   </div>
 
   <script src="tetris.js"></script>

@@ -357,6 +357,36 @@
   });
   canvas.addEventListener('mouseleave', () => { mousePos = null; });
 
+  // Touch control - touch position becomes target
+  function handleTouch(e) {
+    e.preventDefault();
+    if (!gameRunning || gamePaused || gameOver) return;
+    const touch = e.touches[0];
+    if (!touch) return;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    mousePos = {
+      x: (touch.clientX - rect.left) * scaleX,
+      y: (touch.clientY - rect.top) * scaleY
+    };
+    useMouseControl = true;
+  }
+  canvas.addEventListener('touchstart', e => {
+    // If game not started / game over, start game on touch
+    if (!gameRunning || gameOver) {
+      overlayTitle.style.color = '';
+      startGame();
+      return;
+    }
+    handleTouch(e);
+  });
+  canvas.addEventListener('touchmove', handleTouch);
+  canvas.addEventListener('touchend', e => {
+    e.preventDefault();
+    // Keep last position so the plane stays there
+  });
+
   startBtn.addEventListener('click', () => { overlayTitle.style.color = ''; startGame(); });
   pauseBtn.addEventListener('click', togglePause);
 

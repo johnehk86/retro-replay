@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Pong - Retro Replay</title>
   <link rel="stylesheet" href="../../css/style.css">
   <link rel="stylesheet" href="style.css">
@@ -45,11 +45,36 @@
       <button class="btn" id="pauseBtn">PAUSE</button>
     </div>
 
+    <div class="touch-controls" id="touchControls">
+      <div class="touch-group">
+        <span class="touch-group-label">P1</span>
+        <div class="touch-row" style="flex-direction: column; gap: 4px;">
+          <button class="touch-btn" id="touchP1Up" aria-label="P1 Up">&#9650;</button>
+          <button class="touch-btn" id="touchP1Down" aria-label="P1 Down">&#9660;</button>
+        </div>
+      </div>
+      <div class="touch-group" id="touchP2Group" style="margin-left: 3rem;">
+        <span class="touch-group-label">P2</span>
+        <div class="touch-row" style="flex-direction: column; gap: 4px;">
+          <button class="touch-btn touch-btn-magenta" id="touchP2Up" aria-label="P2 Up">&#9650;</button>
+          <button class="touch-btn touch-btn-magenta" id="touchP2Down" aria-label="P2 Down">&#9660;</button>
+        </div>
+      </div>
+    </div>
+
     <div class="controls-help">
       <kbd>W</kbd> <kbd>S</kbd> Player 1 &nbsp;
       <kbd>&uarr;</kbd> <kbd>&darr;</kbd> Player 2 &nbsp;
       <kbd>P</kbd> Pause
     </div>
+    <a href="https://aicraftlog.com" target="_blank" rel="noopener noreferrer" class="ad-banner">
+      <span class="ad-banner-icon">&#10024;</span>
+      <div class="ad-banner-text">
+        <div class="ad-banner-title">AI Craft Log</div>
+        <div class="ad-banner-desc">AI로 만든 더 재미있는 결과물들을 구경하세요!</div>
+      </div>
+      <span class="ad-banner-arrow">&#10132;</span>
+    </a>
   </div>
 
   <script src="pong.js"></script>

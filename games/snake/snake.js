@@ -194,6 +194,35 @@
   startBtn.addEventListener('click', startGame);
   pauseBtn.addEventListener('click', togglePause);
 
+  // Touch D-pad controls
+  function addDirBtn(id, dx, dy) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('touchstart', e => {
+      e.preventDefault();
+      if (!gameRunning || gameOver) {
+        startGame();
+        return;
+      }
+      if (gamePaused) return;
+      // Prevent reversing into body (same check as keyboard)
+      if (dx !== 0 && direction.x !== -dx) nextDirection = { x: dx, y: 0 };
+      if (dy !== 0 && direction.y !== -dy) nextDirection = { x: 0, y: dy };
+    });
+  }
+  addDirBtn('touchUp', 0, -1);
+  addDirBtn('touchDown', 0, 1);
+  addDirBtn('touchLeft', -1, 0);
+  addDirBtn('touchRight', 1, 0);
+
+  // Touch on canvas to start game
+  canvas.addEventListener('touchstart', e => {
+    if (!gameRunning || gameOver) {
+      e.preventDefault();
+      startGame();
+    }
+  });
+
   // Initial draw
   snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
   food = { x: 15, y: 10 };

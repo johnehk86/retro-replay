@@ -250,6 +250,35 @@
   vs2pBtn.addEventListener('click', () => startGame(false));
   pauseBtn.addEventListener('click', togglePause);
 
+  // Touch controls - directly set keys object
+  const touchP2Group = document.getElementById('touchP2Group');
+
+  function setupTouchPaddle(id, key) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('touchstart', e => {
+      e.preventDefault();
+      keys[key] = true;
+    });
+    btn.addEventListener('touchend', e => {
+      e.preventDefault();
+      keys[key] = false;
+    });
+    btn.addEventListener('touchcancel', () => { keys[key] = false; });
+  }
+  setupTouchPaddle('touchP1Up', 'W');
+  setupTouchPaddle('touchP1Down', 'S');
+  setupTouchPaddle('touchP2Up', 'ArrowUp');
+  setupTouchPaddle('touchP2Down', 'ArrowDown');
+
+  // Show/hide P2 controls based on mode
+  vsAiBtn.addEventListener('click', () => {
+    if (touchP2Group) touchP2Group.style.display = 'none';
+  });
+  vs2pBtn.addEventListener('click', () => {
+    if (touchP2Group) touchP2Group.style.display = '';
+  });
+
   // Initial state
   initPaddles();
   ball = { x: W / 2, y: H / 2, dx: 0, dy: 0, size: BALL_SIZE };
