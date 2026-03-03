@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Breakout - Retro Replay</title>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a href="../../index.html" class="home-link btn">&larr; HOME</a>
+
+  <div class="game-container">
+    <div class="game-header">
+      <h1 class="game-title">BREAKOUT</h1>
+    </div>
+
+    <div class="breakout-info">
+      <div class="panel-box">
+        <h3>SCORE</h3>
+        <div class="value" id="score">0</div>
+      </div>
+      <div class="panel-box">
+        <h3>STAGE</h3>
+        <div class="value" id="stage">1</div>
+      </div>
+      <div class="panel-box">
+        <h3>LIVES</h3>
+        <div class="value" id="lives">3</div>
+      </div>
+      <div class="panel-box">
+        <h3>HIGH SCORE</h3>
+        <div class="value" id="highScore">0</div>
+      </div>
+    </div>
+
+    <div class="game-canvas-wrapper" style="position: relative;">
+      <canvas id="gameCanvas" width="480" height="400"></canvas>
+      <div class="overlay hidden" id="overlay">
+        <div class="overlay-title" id="overlayTitle">GAME OVER</div>
+        <div class="overlay-score" id="overlayScore"></div>
+        <div class="overlay-text" id="overlayText">PRESS ENTER TO RESTART</div>
+      </div>
+    </div>
+
+    <div class="game-controls">
+      <button class="btn btn-green" id="startBtn">START</button>
+      <button class="btn" id="pauseBtn">PAUSE</button>
+    </div>
+
+    <div class="controls-help">
+      <kbd>&larr;</kbd> <kbd>&rarr;</kbd> Move Paddle &nbsp;
+      <kbd>Space</kbd> Launch Ball &nbsp;
+      <kbd>P</kbd> Pause
+    </div>
+  </div>
+
+  <script src="breakout.js"></script>
+</body>
+</html>

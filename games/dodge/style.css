@@ -1,0 +1,57 @@
+/* Dodge - Bullet Hell Style */
+
+.dodge-info {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.dodge-info .panel-box {
+  border: 2px solid var(--neon-cyan);
+  padding: 0.8rem 1.5rem;
+  background: rgba(0, 0, 0, 0.5);
+  text-align: center;
+  min-width: 100px;
+}
+
+.dodge-info .panel-box h3 {
+  font-size: 0.5rem;
+  color: var(--neon-cyan);
+  margin-bottom: 0.3rem;
+}
+
+.dodge-info .panel-box .value {
+  font-size: 0.85rem;
+  color: var(--neon-yellow);
+  text-shadow: 0 0 5px var(--neon-yellow);
+}
+
+.dodge-info .panel-box .value.time-danger {
+  color: var(--neon-red);
+  text-shadow: 0 0 8px var(--neon-red);
+}
+
+.dodge-info .panel-box .value.time-safe {
+  color: var(--neon-green);
+  text-shadow: 0 0 8px var(--neon-green);
+}
+
+.progress-bar {
+  width: 100%;
+  max-width: 400px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--neon-cyan);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--neon-red), var(--neon-yellow), var(--neon-green));
+  transition: width 0.3s;
+  border-radius: 4px;
+}

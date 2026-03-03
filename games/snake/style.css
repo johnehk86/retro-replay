@@ -1,0 +1,28 @@
+/* Snake Game Styles */
+
+.snake-info {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.snake-info .panel-box {
+  border: 2px solid var(--neon-cyan);
+  padding: 0.8rem 1.5rem;
+  background: rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.snake-info .panel-box h3 {
+  font-size: 0.5rem;
+  color: var(--neon-cyan);
+  margin-bottom: 0.3rem;
+}
+
+.snake-info .panel-box .value {
+  font-size: 0.85rem;
+  color: var(--neon-yellow);
+  text-shadow: 0 0 5px var(--neon-yellow);
+}

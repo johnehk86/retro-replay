@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minesweeper - Retro Replay</title>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a href="../../index.html" class="home-link btn">&larr; HOME</a>
+
+  <div class="game-container">
+    <div class="game-header">
+      <h1 class="game-title">MINESWEEPER</h1>
+    </div>
+
+    <div class="difficulty-select">
+      <button class="btn btn-green active" data-diff="easy">EASY</button>
+      <button class="btn" data-diff="medium">MEDIUM</button>
+      <button class="btn btn-magenta" data-diff="hard">HARD</button>
+    </div>
+
+    <div class="mine-info">
+      <div class="panel-box">
+        <h3>MINES</h3>
+        <div class="value" id="mineCount">10</div>
+      </div>
+      <div class="panel-box">
+        <h3>TIME</h3>
+        <div class="value" id="timer">000</div>
+      </div>
+      <div class="panel-box">
+        <h3>BEST</h3>
+        <div class="value" id="bestTime">---</div>
+      </div>
+    </div>
+
+    <div class="mine-status" id="status"></div>
+
+    <div class="mine-grid" id="grid"></div>
+
+    <div class="game-controls" style="margin-top: 1rem;">
+      <button class="btn btn-green" id="newGameBtn">NEW GAME</button>
+    </div>
+
+    <div class="controls-help">
+      <kbd>Left Click</kbd> Open Cell &nbsp;
+      <kbd>Right Click</kbd> Flag/Unflag
+    </div>
+  </div>
+
+  <script src="minesweeper.js"></script>
+</body>
+</html>

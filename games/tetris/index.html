@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tetris - Retro Replay</title>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a href="../../index.html" class="home-link btn">&larr; HOME</a>
+
+  <div class="game-container">
+    <div class="game-header">
+      <h1 class="game-title">TETRIS</h1>
+    </div>
+
+    <div class="tetris-layout">
+      <div class="side-panel">
+        <div class="panel-box">
+          <h3>SCORE</h3>
+          <div class="value" id="score">0</div>
+        </div>
+        <div class="panel-box">
+          <h3>LEVEL</h3>
+          <div class="value" id="level">1</div>
+        </div>
+        <div class="panel-box">
+          <h3>LINES</h3>
+          <div class="value" id="lines">0</div>
+        </div>
+        <div class="panel-box">
+          <h3>HIGH SCORE</h3>
+          <div class="value" id="highScore">0</div>
+        </div>
+      </div>
+
+      <div class="game-canvas-wrapper" style="position: relative;">
+        <canvas id="gameCanvas" width="300" height="600"></canvas>
+        <div class="overlay hidden" id="overlay">
+          <div class="overlay-title" id="overlayTitle">GAME OVER</div>
+          <div class="overlay-score" id="overlayScore"></div>
+          <div class="overlay-text">PRESS ENTER TO RESTART</div>
+        </div>
+      </div>
+
+      <div class="side-panel">
+        <div class="panel-box">
+          <h3>NEXT</h3>
+          <div class="next-preview">
+            <canvas id="nextCanvas" width="120" height="120"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-controls">
+      <button class="btn btn-green" id="startBtn">START</button>
+      <button class="btn" id="pauseBtn">PAUSE</button>
+    </div>
+
+    <div class="controls-help">
+      <kbd>&larr;</kbd> <kbd>&rarr;</kbd> Move &nbsp;
+      <kbd>&uarr;</kbd> Rotate &nbsp;
+      <kbd>&darr;</kbd> Soft Drop &nbsp;
+      <kbd>Space</kbd> Hard Drop &nbsp;
+      <kbd>P</kbd> Pause
+    </div>
+  </div>
+
+  <script src="tetris.js"></script>
+</body>
+</html>

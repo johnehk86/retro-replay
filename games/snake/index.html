@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake - Retro Replay</title>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a href="../../index.html" class="home-link btn">&larr; HOME</a>
+
+  <div class="game-container">
+    <div class="game-header">
+      <h1 class="game-title">SNAKE</h1>
+    </div>
+
+    <div class="snake-info">
+      <div class="panel-box">
+        <h3>SCORE</h3>
+        <div class="value" id="score">0</div>
+      </div>
+      <div class="panel-box">
+        <h3>HIGH SCORE</h3>
+        <div class="value" id="highScore">0</div>
+      </div>
+    </div>
+
+    <div class="game-canvas-wrapper" style="position: relative;">
+      <canvas id="gameCanvas" width="400" height="400"></canvas>
+      <div class="overlay hidden" id="overlay">
+        <div class="overlay-title" id="overlayTitle">GAME OVER</div>
+        <div class="overlay-score" id="overlayScore"></div>
+        <div class="overlay-text">PRESS ENTER TO RESTART</div>
+      </div>
+    </div>
+
+    <div class="game-controls">
+      <button class="btn btn-green" id="startBtn">START</button>
+      <button class="btn" id="pauseBtn">PAUSE</button>
+    </div>
+
+    <div class="controls-help">
+      <kbd>&larr;</kbd> <kbd>&uarr;</kbd> <kbd>&darr;</kbd> <kbd>&rarr;</kbd> Move &nbsp;
+      <kbd>P</kbd> Pause
+    </div>
+  </div>
+
+  <script src="snake.js"></script>
+</body>
+</html>

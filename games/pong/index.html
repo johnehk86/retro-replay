@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pong - Retro Replay</title>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a href="../../index.html" class="home-link btn">&larr; HOME</a>
+
+  <div class="game-container">
+    <div class="game-header">
+      <h1 class="game-title">PONG</h1>
+    </div>
+
+    <div class="mode-select">
+      <button class="btn btn-green" id="vsAiBtn">VS AI</button>
+      <button class="btn btn-magenta" id="vs2pBtn">2 PLAYERS</button>
+    </div>
+
+    <div class="pong-info">
+      <div class="panel-box">
+        <h3>PLAYER 1</h3>
+        <div class="value" id="score1">0</div>
+      </div>
+      <span class="pong-vs">VS</span>
+      <div class="panel-box">
+        <h3 id="p2Label">CPU</h3>
+        <div class="value" id="score2">0</div>
+      </div>
+    </div>
+
+    <div class="game-canvas-wrapper" style="position: relative;">
+      <canvas id="gameCanvas" width="500" height="350"></canvas>
+      <div class="overlay hidden" id="overlay">
+        <div class="overlay-title" id="overlayTitle">PONG</div>
+        <div class="overlay-score" id="overlayScore"></div>
+        <div class="overlay-text" id="overlayText">PRESS ENTER TO START</div>
+      </div>
+    </div>
+
+    <div class="game-controls">
+      <button class="btn" id="pauseBtn">PAUSE</button>
+    </div>
+
+    <div class="controls-help">
+      <kbd>W</kbd> <kbd>S</kbd> Player 1 &nbsp;
+      <kbd>&uarr;</kbd> <kbd>&darr;</kbd> Player 2 &nbsp;
+      <kbd>P</kbd> Pause
+    </div>
+  </div>
+
+  <script src="pong.js"></script>
+</body>
+</html>

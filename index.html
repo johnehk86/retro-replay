@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html class="dark" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retro Replay - 추억의 아케이드</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#a413ec",
+            "accent-cyan": "#00f3ff",
+            "accent-pink": "#ff00e5",
+            "background-dark": "#1c1022",
+          },
+          fontFamily: {
+            "display": ["Spline Sans", "sans-serif"]
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    .retro-grid {
+      background-image:
+        linear-gradient(to right, rgba(164, 19, 236, 0.15) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(164, 19, 236, 0.15) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .text-glow-cyan { text-shadow: 0 0 10px rgba(0,243,255,0.8), 0 0 30px rgba(0,243,255,0.3); }
+    .text-glow-pink { text-shadow: 0 0 10px rgba(255,0,229,0.8), 0 0 30px rgba(255,0,229,0.3); }
+    .arcade-btn {
+      box-shadow: 0 4px 0 0 #7a0eb0, 0 8px 15px rgba(164,19,236,0.4);
+    }
+    .arcade-btn:active {
+      box-shadow: 0 2px 0 0 #7a0eb0;
+      transform: translateY(2px);
+    }
+    .game-card-hover { transition: transform 0.4s, box-shadow 0.4s; }
+    .game-card-hover:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 0 25px rgba(164,19,236,0.5), 0 0 50px rgba(0,243,255,0.15);
+    }
+    .game-card-hover:hover .card-preview { transform: scale(1.1); }
+    .card-preview { transition: transform 0.5s; }
+    canvas.pixel-preview { image-rendering: pixelated; width: 100%; height: 100%; }
+    .scanlines::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(0deg, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 1px, transparent 1px, transparent 3px);
+    }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .float-anim { animation: float 3s ease-in-out infinite; }
+    @keyframes pulse-glow { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
+    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    @keyframes border-glow {
+      0%,100% { border-color: rgba(0,243,255,0.4); box-shadow: 0 0 15px rgba(0,243,255,0.15); }
+      50% { border-color: rgba(255,0,229,0.5); box-shadow: 0 0 25px rgba(255,0,229,0.2), 0 0 50px rgba(164,19,236,0.1); }
+    }
+    .hero-canvas-border { animation: border-glow 3s ease-in-out infinite; }
+    body { min-height: 100dvh; }
+  </style>
+</head>
+<body class="bg-background-dark font-display text-slate-100 antialiased overflow-x-hidden">
+  <div class="relative flex min-h-screen flex-col">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 flex items-center bg-background-dark/80 backdrop-blur-md px-4 py-3 justify-between border-b border-primary/20">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-accent-cyan text-3xl">videogame_asset</span>
+      </div>
+      <h1 class="text-xl font-black tracking-tighter uppercase italic text-glow-pink">
+        RETRO REPLAY
+      </h1>
+      <button class="flex items-center justify-center rounded-lg h-10 w-10 bg-primary/20 text-accent-cyan hover:bg-primary/30 transition-colors">
+        <span class="material-symbols-outlined">leaderboard</span>
+      </button>
+    </header>
+
+    <main class="flex-1 pb-24">
+
+      <!-- ========== HERO: DODGE 중심 ========== -->
+      <section class="relative overflow-hidden">
+        <div class="absolute inset-0 retro-grid opacity-40"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-background-dark/0 via-background-dark/40 to-background-dark"></div>
+        <div class="absolute top-16 left-6 w-3 h-3 bg-accent-cyan/40 rotate-45 float-anim"></div>
+        <div class="absolute top-28 right-10 w-2 h-2 bg-accent-pink/50 rotate-12 float-anim" style="animation-delay:1s"></div>
+        <div class="absolute top-44 left-1/4 w-2 h-2 bg-primary/60 float-anim" style="animation-delay:0.5s"></div>
+
+        <div class="relative px-4 pt-10 pb-8 flex flex-col items-center text-center gap-6 max-w-xl mx-auto">
+          <!-- Badge -->
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent-pink/50 text-accent-pink text-[10px] font-bold tracking-[0.2em] uppercase pulse-glow">
+            <span class="material-symbols-outlined text-sm">local_fire_department</span>
+            Featured Game
+          </div>
+
+          <!-- Title -->
+          <div class="space-y-3">
+            <h2 class="text-5xl sm:text-6xl font-black leading-[0.9] tracking-tighter uppercase italic">
+              <span class="text-accent-cyan text-glow-cyan">DODGE</span>
+            </h2>
+            <p class="text-slate-400 text-sm max-w-[320px] mx-auto leading-relaxed">
+              끝없이 쏟아지는 미사일 속에서 살아남아라.<br>
+              <span class="text-accent-pink font-bold">60초</span> 생존이 목표!
+            </p>
+          </div>
+
+          <!-- Live Animated Canvas Preview -->
+          <div class="relative w-full max-w-[340px] aspect-square rounded-2xl overflow-hidden border-2 border-accent-cyan/40 hero-canvas-border scanlines">
+            <canvas id="hero-dodge-canvas" width="340" height="340" class="w-full h-full" style="image-rendering: auto;"></canvas>
+            <!-- Play overlay on canvas -->
+            <a href="games/dodge/index.html" id="heroPlayOverlay"
+               class="absolute inset-0 flex flex-col items-center justify-center bg-black/40 hover:bg-black/20 transition-all cursor-pointer group">
+              <div class="w-16 h-16 rounded-full bg-primary/80 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-primary transition-all shadow-lg shadow-primary/50">
+                <span class="material-symbols-outlined text-white text-3xl" style="font-variation-settings:'FILL' 1">play_arrow</span>
+              </div>
+              <span class="text-white text-xs font-black uppercase tracking-widest">Play Now</span>
+            </a>
+          </div>
+
+          <!-- Stats row -->
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+              <span class="material-symbols-outlined text-accent-cyan text-sm">timer</span>
+              <span class="text-[10px] font-bold text-slate-300">60초 생존</span>
+            </div>
+            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+              <span class="material-symbols-outlined text-accent-pink text-sm">rocket_launch</span>
+              <span class="text-[10px] font-bold text-slate-300">호밍 미사일</span>
+            </div>
+            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+              <span class="material-symbols-outlined text-accent-cyan text-sm">mouse</span>
+              <span class="text-[10px] font-bold text-slate-300">마우스 조작</span>
+            </div>
+          </div>
+
+          <!-- Best score -->
+          <div class="text-[11px] text-slate-500 font-medium" id="hs-dodge-hero">최고 기록에 도전하세요!</div>
+
+          <!-- CTA Button -->
+          <a href="games/dodge/index.html" class="arcade-btn flex min-w-[240px] cursor-pointer items-center justify-center gap-2 rounded-xl h-14 bg-primary text-white text-base font-black tracking-widest uppercase transition-all hover:brightness-110">
+            <span class="material-symbols-outlined text-xl">play_arrow</span>
+            <span>Start Dodge</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- ========== MORE CLASSICS ========== -->
+      <section id="games" class="px-4 pt-6 pb-8 scroll-mt-16">
+        <div class="flex items-center justify-between mb-6 max-w-2xl mx-auto">
+          <h3 class="text-xl font-black tracking-tight uppercase italic flex items-center gap-3">
+            <span class="h-1 w-8 bg-accent-pink rounded-full"></span>
+            More Classics
+          </h3>
+          <span class="text-accent-cyan text-xs font-bold uppercase tracking-wider">5 Games</span>
+        </div>
+
+        <!-- 2-column game grid (나머지 5개) -->
+        <div class="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
+
+          <!-- Tetris -->
+          <a href="games/tetris/index.html" class="game-card-hover group relative aspect-square rounded-xl overflow-hidden border border-primary/30 bg-primary/10 scanlines block">
+            <div class="card-preview absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1a0a2e] via-[#0d1b2a] to-[#1a0a2e]">
+              <canvas id="preview-tetris" class="pixel-preview" width="80" height="80"></canvas>
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent"></div>
+            <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span class="material-symbols-outlined text-accent-cyan text-xl">play_circle</span>
+            </div>
+            <div class="absolute bottom-0 left-0 p-3 w-full">
+              <div class="text-accent-cyan text-[10px] font-bold uppercase mb-1 tracking-wider">Puzzle</div>
+              <p class="text-white text-sm font-black uppercase italic leading-tight">Tetris</p>
+              <p class="text-slate-500 text-[10px] mt-1 font-medium" id="hs-tetris">블록을 쌓아 라인 클리어</p>
+            </div>
+          </a>
+
+          <!-- Snake -->
+          <a href="games/snake/index.html" class="game-card-hover group relative aspect-square rounded-xl overflow-hidden border border-primary/30 bg-primary/10 scanlines block">
+            <div class="card-preview absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#0a1e0a] via-[#0d1b2a] to-[#0a1e0a]">
+              <canvas id="preview-snake" class="pixel-preview" width="80" height="80"></canvas>
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent"></div>
+            <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span class="material-symbols-outlined text-accent-cyan text-xl">play_circle</span>
+            </div>
+            <div class="absolute bottom-0 left-0 p-3 w-full">
+              <div class="text-accent-pink text-[10px] font-bold uppercase mb-1 tracking-wider">Arcade</div>
+              <p class="text-white text-sm font-black uppercase italic leading-tight">Snake</p>
+              <p class="text-slate-500 text-[10px] mt-1 font-medium" id="hs-snake">먹이를 먹고 길게 성장</p>
+            </div>
+          </a>
+
+          <!-- Breakout -->
+          <a href="games/breakout/index.html" class="game-card-hover group relative aspect-square rounded-xl overflow-hidden border border-primary/30 bg-primary/10 scanlines block">
+            <div class="card-preview absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#2a0a0a] via-[#1b0d2a] to-[#0a1a2e]">
+              <canvas id="preview-breakout" class="pixel-preview" width="80" height="80"></canvas>
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent"></div>
+            <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span class="material-symbols-outlined text-accent-cyan text-xl">play_circle</span>
+            </div>
+            <div class="absolute bottom-0 left-0 p-3 w-full">
+              <div class="text-accent-cyan text-[10px] font-bold uppercase mb-1 tracking-wider">Action</div>
+              <p class="text-white text-sm font-black uppercase italic leading-tight">Breakout</p>
+              <p class="text-slate-500 text-[10px] mt-1 font-medium" id="hs-breakout">공을 튕겨 벽돌 파괴</p>
+            </div>
+          </a>
+
+          <!-- Pong -->
+          <a href="games/pong/index.html" class="game-card-hover group relative aspect-square rounded-xl overflow-hidden border border-primary/30 bg-primary/10 scanlines block">
+            <div class="card-preview absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#0a0a2e] via-[#1b0d2a] to-[#0a0a2e]">
+              <canvas id="preview-pong" class="pixel-preview" width="80" height="80"></canvas>
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent"></div>
+            <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span class="material-symbols-outlined text-accent-cyan text-xl">play_circle</span>
+            </div>
+            <div class="absolute bottom-0 left-0 p-3 w-full">
+              <div class="text-accent-pink text-[10px] font-bold uppercase mb-1 tracking-wider">Sports</div>
+              <p class="text-white text-sm font-black uppercase italic leading-tight">Pong</p>
+              <p class="text-slate-500 text-[10px] mt-1 font-medium" id="hs-pong">클래식 탁구 대전</p>
+            </div>
+          </a>
+        </div>
+
+        <!-- Minesweeper - Full width -->
+        <div class="max-w-2xl mx-auto mt-4">
+          <a href="games/minesweeper/index.html" class="game-card-hover group relative h-48 rounded-xl overflow-hidden border border-primary/30 bg-primary/10 scanlines block">
+            <div class="card-preview absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1a1a0a] via-[#1b0d2a] to-[#0a1a1a]">
+              <canvas id="preview-mine" class="pixel-preview" width="160" height="80"></canvas>
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent"></div>
+            <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span class="material-symbols-outlined text-accent-cyan text-xl">play_circle</span>
+            </div>
+            <div class="absolute bottom-0 left-0 p-4 w-full flex items-end justify-between">
+              <div>
+                <div class="text-accent-cyan text-[10px] font-bold uppercase mb-1 tracking-wider">Strategy</div>
+                <p class="text-white text-base font-black uppercase italic leading-tight">Minesweeper</p>
+                <p class="text-slate-500 text-[10px] mt-1 font-medium" id="hs-minesweeper">지뢰를 피해 모든 칸을 열어라</p>
+              </div>
+              <div class="bg-accent-pink/20 text-accent-pink text-[10px] font-bold uppercase px-3 py-1 rounded-full border border-accent-pink/30">
+                3 Difficulty
+              </div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Stats Banner -->
+      <section class="px-4 py-6 max-w-2xl mx-auto">
+        <div class="rounded-2xl bg-gradient-to-br from-primary via-accent-pink/80 to-primary/80 p-6 flex flex-col items-center text-center gap-4 relative overflow-hidden">
+          <div class="absolute -right-6 -top-6 opacity-15">
+            <span class="material-symbols-outlined" style="font-size:120px">stadia_controller</span>
+          </div>
+          <div class="absolute -left-4 -bottom-4 opacity-10">
+            <span class="material-symbols-outlined" style="font-size:80px">sports_esports</span>
+          </div>
+          <h3 class="text-white text-2xl font-black uppercase italic tracking-tighter relative z-10">All Games Free</h3>
+          <p class="text-white/80 text-xs font-medium relative z-10 max-w-[260px]">빌드 도구 없이 순수 HTML/CSS/JS로 제작. 브라우저만 있으면 바로 플레이!</p>
+          <div class="flex gap-6 relative z-10 mt-1">
+            <div class="flex flex-col items-center">
+              <span class="text-white text-2xl font-black">6</span>
+              <span class="text-white/60 text-[10px] uppercase font-bold">Games</span>
+            </div>
+            <div class="w-px bg-white/20"></div>
+            <div class="flex flex-col items-center">
+              <span class="text-white text-2xl font-black">&infin;</span>
+              <span class="text-white/60 text-[10px] uppercase font-bold">Plays</span>
+            </div>
+            <div class="w-px bg-white/20"></div>
+            <div class="flex flex-col items-center">
+              <span class="text-white text-2xl font-black">0</span>
+              <span class="text-white/60 text-[10px] uppercase font-bold">Installs</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-primary/30 bg-background-dark/95 backdrop-blur-lg px-2 py-3">
+      <a class="flex flex-col items-center gap-1 text-primary" href="#">
+        <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1">home</span>
+        <p class="text-[10px] font-bold uppercase tracking-tighter">Home</p>
+      </a>
+      <a class="flex flex-col items-center gap-1 text-slate-500 hover:text-accent-cyan transition-colors" href="#games">
+        <span class="material-symbols-outlined text-2xl">sports_esports</span>
+        <p class="text-[10px] font-bold uppercase tracking-tighter">Games</p>
+      </a>
+      <a class="flex flex-col items-center gap-1 text-slate-500 hover:text-accent-cyan transition-colors" href="#">
+        <span class="material-symbols-outlined text-2xl">trophy</span>
+        <p class="text-[10px] font-bold uppercase tracking-tighter">Awards</p>
+      </a>
+      <a class="flex flex-col items-center gap-1 text-slate-500 hover:text-accent-cyan transition-colors" href="#">
+        <span class="material-symbols-outlined text-2xl">settings</span>
+        <p class="text-[10px] font-bold uppercase tracking-tighter">Config</p>
+      </a>
+    </nav>
+
+  </div>
+
+  <script>
+    // =============================================
+    // HERO: Live Dodge Animation Demo
+    // =============================================
+    (() => {
+      const c = document.getElementById('hero-dodge-canvas');
+      if (!c) return;
+      const ctx = c.getContext('2d');
+      const W = c.width, H = c.height;
+
+      // Auto-pilot player
+      let player = { x: W/2, y: H/2 };
+      let targetX = W/2, targetY = H/2;
+      let missiles = [];
+      let frame = 0;
+
+      function spawnMissile() {
+        const edge = Math.floor(Math.random() * 4);
+        let x, y;
+        switch (edge) {
+          case 0: x = Math.random()*W; y = -8; break;
+          case 1: x = Math.random()*W; y = H+8; break;
+          case 2: x = -8; y = Math.random()*H; break;
+          case 3: x = W+8; y = Math.random()*H; break;
+        }
+        missiles.push({ x, y, speed: 0.8 + Math.random()*0.6 });
+      }
+
+      function update() {
+        frame++;
+
+        // Spawn
+        if (frame % 25 === 0) spawnMissile();
+        if (frame % 40 === 0) spawnMissile();
+
+        // AI movement: dodge nearest missile
+        if (frame % 30 === 0 || missiles.length === 0) {
+          targetX = 60 + Math.random()*(W-120);
+          targetY = 60 + Math.random()*(H-120);
+        }
+
+        // Find nearest missile and dodge
+        let nearest = null, nearDist = Infinity;
+        missiles.forEach(m => {
+          const d = Math.sqrt((m.x-player.x)**2 + (m.y-player.y)**2);
+          if (d < nearDist) { nearDist = d; nearest = m; }
+        });
+
+        if (nearest && nearDist < 80) {
+          // Dodge away from nearest
+          const dx = player.x - nearest.x;
+          const dy = player.y - nearest.y;
+          const d = Math.sqrt(dx*dx+dy*dy) || 1;
+          targetX = player.x + (dx/d)*100;
+          targetY = player.y + (dy/d)*100;
+          targetX = Math.max(30, Math.min(W-30, targetX));
+          targetY = Math.max(30, Math.min(H-30, targetY));
+        }
+
+        // Smooth move toward target
+        player.x += (targetX - player.x) * 0.06;
+        player.y += (targetY - player.y) * 0.06;
+        player.x = Math.max(16, Math.min(W-16, player.x));
+        player.y = Math.max(16, Math.min(H-16, player.y));
+
+        // Move missiles
+        for (let i = missiles.length-1; i >= 0; i--) {
+          const m = missiles[i];
+          const dx = player.x - m.x;
+          const dy = player.y - m.y;
+          const d = Math.sqrt(dx*dx+dy*dy) || 1;
+          m.x += (dx/d)*m.speed;
+          m.y += (dy/d)*m.speed;
+
+          // Remove if collided (just respawn — it's a demo)
+          if (d < 14) {
+            missiles.splice(i, 1);
+          }
+        }
+
+        // Cap missiles for performance
+        if (missiles.length > 35) missiles.splice(0, 5);
+      }
+
+      function draw() {
+        // BG
+        ctx.fillStyle = '#0d0510';
+        ctx.fillRect(0, 0, W, H);
+
+        // Grid
+        ctx.strokeStyle = 'rgba(164,19,236,0.07)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < W; x += 30) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+        for (let y = 0; y < H; y += 30) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+        // Danger vignette
+        const grad = ctx.createRadialGradient(W/2,H/2,H*0.25, W/2,H/2,H*0.65);
+        grad.addColorStop(0, 'transparent');
+        grad.addColorStop(1, 'rgba(255,0,68,0.06)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0,0,W,H);
+
+        // Missiles
+        missiles.forEach(m => {
+          // Trail
+          const dx = player.x-m.x, dy = player.y-m.y;
+          const d = Math.sqrt(dx*dx+dy*dy)||1;
+          ctx.beginPath();
+          ctx.moveTo(m.x, m.y);
+          ctx.lineTo(m.x - (dx/d)*10, m.y - (dy/d)*10);
+          ctx.strokeStyle = 'rgba(255,0,68,0.15)';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+
+          // Glow
+          ctx.beginPath();
+          ctx.arc(m.x, m.y, 8, 0, Math.PI*2);
+          ctx.fillStyle = 'rgba(255,0,68,0.12)';
+          ctx.fill();
+
+          // Body
+          ctx.beginPath();
+          ctx.arc(m.x, m.y, 5, 0, Math.PI*2);
+          ctx.fillStyle = '#ff0044';
+          ctx.fill();
+
+          // Highlight
+          ctx.beginPath();
+          ctx.arc(m.x-1.5, m.y-1.5, 2, 0, Math.PI*2);
+          ctx.fillStyle = 'rgba(255,180,180,0.4)';
+          ctx.fill();
+        });
+
+        // Player
+        ctx.save();
+        ctx.translate(player.x, player.y);
+
+        // Engine
+        ctx.beginPath();
+        ctx.moveTo(-5, 9);
+        ctx.lineTo(5, 9);
+        ctx.lineTo(0, 9 + 6 + Math.random()*4);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(0,243,255,0.35)';
+        ctx.fill();
+
+        // Glow
+        ctx.shadowColor = '#00f3ff';
+        ctx.shadowBlur = 18;
+
+        // Ship
+        ctx.beginPath();
+        ctx.moveTo(0, -12);
+        ctx.lineTo(-10, 8);
+        ctx.lineTo(10, 8);
+        ctx.closePath();
+        ctx.fillStyle = '#00f3ff';
+        ctx.fill();
+
+        // Inner
+        ctx.shadowBlur = 0;
+        ctx.beginPath();
+        ctx.moveTo(0, -5);
+        ctx.lineTo(-4, 4);
+        ctx.lineTo(4, 4);
+        ctx.closePath();
+        ctx.fillStyle = '#005566';
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      function loop() {
+        update();
+        draw();
+        requestAnimationFrame(loop);
+      }
+
+      // Seed initial missiles
+      for (let i = 0; i < 12; i++) spawnMissile();
+      loop();
+    })();
+
+    // =============================================
+    // Small Pixel Previews for Other Games
+    // =============================================
+    function drawTetrisPreview() {
+      const c = document.getElementById('preview-tetris');
+      if (!c) return;
+      const ctx = c.getContext('2d');
+      const colors = ['#00f3ff','#ff00e5','#a413ec','#ffff00','#39ff14','#ff6600','#ff0044'];
+      const blocks = [[2,5],[3,5],[4,5],[5,5],[1,6],[2,6],[1,7],[2,7],[4,6],[5,6],[6,6],[5,7],[3,3],[4,3],[5,3],[5,4],[6,4],[7,4],[7,3],[7,2]];
+      ctx.fillStyle = '#0d0d1a';
+      ctx.fillRect(0,0,80,80);
+      blocks.forEach((b,i) => {
+        ctx.fillStyle = colors[i%colors.length];
+        ctx.fillRect(b[0]*8+1,b[1]*8+1,7,7);
+        ctx.fillStyle = 'rgba(255,255,255,0.15)';
+        ctx.fillRect(b[0]*8+1,b[1]*8+1,7,2);
+      });
+    }
+    function drawSnakePreview() {
+      const c = document.getElementById('preview-snake');
+      if (!c) return;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#0a1a0a';
+      ctx.fillRect(0,0,80,80);
+      [[5,4],[4,4],[3,4],[3,5],[3,6],[4,6],[5,6],[6,6],[7,6],[7,5]].forEach((s,i) => {
+        ctx.fillStyle = `rgba(57,255,20,${1-i*0.08})`;
+        ctx.fillRect(s[0]*8+1,s[1]*8+1,7,7);
+      });
+      ctx.fillStyle = '#ff0044';
+      ctx.fillRect(7*8+2,3*8+2,5,5);
+    }
+    function drawBreakoutPreview() {
+      const c = document.getElementById('preview-breakout');
+      if (!c) return;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#0d0d1a';
+      ctx.fillRect(0,0,80,80);
+      const rc = ['#ff0044','#ff6600','#ffff00','#39ff14','#00f3ff'];
+      for (let r=0;r<5;r++) for (let col=0;col<8;col++) {
+        if (r===2&&(col===3||col===5)) continue;
+        if (r===3&&col===6) continue;
+        ctx.fillStyle=rc[r]; ctx.fillRect(col*10+1,r*6+4,9,5);
+      }
+      ctx.fillStyle='#00f3ff'; ctx.fillRect(28,70,24,4);
+      ctx.fillStyle='#fff'; ctx.fillRect(38,60,4,4);
+    }
+    function drawPongPreview() {
+      const c = document.getElementById('preview-pong');
+      if (!c) return;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#0a0a1a';
+      ctx.fillRect(0,0,80,80);
+      ctx.setLineDash([4,4]); ctx.strokeStyle='rgba(255,255,255,0.15)';
+      ctx.beginPath(); ctx.moveTo(40,0); ctx.lineTo(40,80); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle='#00f3ff'; ctx.fillRect(6,25,4,20);
+      ctx.fillStyle='#ff00e5'; ctx.fillRect(70,35,4,20);
+      ctx.fillStyle='#fff'; ctx.fillRect(44,38,5,5);
+    }
+    function drawMinePreview() {
+      const c = document.getElementById('preview-mine');
+      if (!c) return;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#0d0d1a';
+      ctx.fillRect(0,0,160,80);
+      const sz=9;
+      for (let r=0;r<7;r++) for (let col=0;col<14;col++) {
+        const x=col*(sz+1)+16, y=r*(sz+1)+7;
+        const rev=(r+col)%3===0||(r===2&&col>5)||(r===4&&col<4);
+        if (rev) {
+          ctx.fillStyle='#1a1a2e'; ctx.fillRect(x,y,sz,sz);
+          const n=((r*3+col*7)%5)+1;
+          if (n<=3) { ctx.fillStyle=n===1?'#00f3ff':n===2?'#39ff14':'#ff0044'; ctx.font='7px monospace'; ctx.fillText(n.toString(),x+2,y+8); }
+        } else {
+          ctx.fillStyle='#2a2a4e'; ctx.fillRect(x,y,sz,sz);
+          ctx.fillStyle='#3a3a6e'; ctx.fillRect(x,y,sz,2); ctx.fillRect(x,y,2,sz);
+        }
+      }
+      ctx.fillStyle='#ff0044'; ctx.fillRect(16+5*(sz+1)+2,7+1*(sz+1)+2,5,5);
+    }
+
+    drawTetrisPreview();
+    drawSnakePreview();
+    drawBreakoutPreview();
+    drawPongPreview();
+    drawMinePreview();
+
+    // =============================================
+    // High Scores
+    // =============================================
+    const gameList = [
+      { key: 'tetris', el: 'hs-tetris' },
+      { key: 'snake', el: 'hs-snake' },
+      { key: 'breakout', el: 'hs-breakout' },
+      { key: 'pong', el: 'hs-pong' },
+      { key: 'minesweeper', el: 'hs-minesweeper' },
+    ];
+    gameList.forEach(g => {
+      const el = document.getElementById(g.el);
+      const score = localStorage.getItem(`${g.key}-highscore`);
+      if (el && score) {
+        el.textContent = `HIGH SCORE: ${score}`;
+        el.classList.remove('text-slate-500');
+        el.classList.add('text-accent-cyan');
+      }
+    });
+
+    // Dodge hero best score
+    const dodgeBest = localStorage.getItem('dodge-highscore');
+    const dodgeHeroEl = document.getElementById('hs-dodge-hero');
+    if (dodgeBest && dodgeHeroEl) {
+      dodgeHeroEl.textContent = `BEST: ${dodgeBest}s`;
+      dodgeHeroEl.classList.add('text-accent-cyan');
+      dodgeHeroEl.classList.remove('text-slate-500');
+    }
+  </script>
+</body>
+</html>
